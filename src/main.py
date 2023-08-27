@@ -1,21 +1,35 @@
-from agent.agent import chat_with_agent
-from utils.config import load_config, setup_environment_variables
+# /app/src/main.py
 
-# Load configuration from config.yml
+# Primary Components
+from fastapi import FastAPI
+
+# Internal Modules
+from src.api.routes import router
+from src.utils.config import load_config, setup_environment_variables
+from src.agent.agent_handler import get_agent_handler, AgentHandler  # Dependency function and AgentHandler for the application
+
+# Load configuration and set up environment variables
 config = load_config()
-
-# Set up the environment variables
 setup_environment_variables(config)
 
-def main():
-    print("Greetings! My name is", config["chatbot"]["name"], ". Type 'exit' to end the session.")
-    while True:
-        user_input = input("You: ")
-        if user_input.lower() == "exit":
-            print("Goodbye!")
-            break
-        response = chat_with_agent(user_input, config["chatbot"]["name"])
-        print(config["chatbot"]["name"] + ":", response)
+# Initialize the FastAPI application
+app = FastAPI()
 
-if __name__ == "__main__":
-    main()
+@app.on_event("startup")
+async def startup_event():
+    """
+    Actions to be performed when the application starts up.
+    Currently initializes the AgentHandler. Extend this function if more startup logic is needed.
+    """
+    app.agent_instance = get_agent_handler()
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """
+    Cleanup actions to be performed when the application shuts down.
+    Extend this function if any cleanup logic for components like AgentHandler is required.
+    """
+    pass
+
+# Include the API router
+app.include_router(router)

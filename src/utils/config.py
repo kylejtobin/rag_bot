@@ -1,26 +1,38 @@
-import yaml
-from dotenv import load_dotenv
+# /app/src/utils/config.py
+
+# Utilities
 import os
 from pathlib import Path
-def load_config():
-    # Find the project root based on the location of this file
-    project_root = Path(__file__).resolve().parents[2]
-    config_file_path = project_root.joinpath("config.yml")
+import yaml
+from dotenv import load_dotenv
+
+def load_config() -> dict:
+    """
+    Load the configuration from a YAML file located in the project root.
+
+    Returns:
+        dict: Configuration parameters from the YAML file.
+    """
     
+    # Determine the project root based on the current file's location
+    project_root = Path(__file__).resolve().parents[2]
+    config_file_path = project_root / "config.yml"
+    
+    # Safely open and read the configuration file
     with open(config_file_path, 'r') as stream:
         try:
             config = yaml.safe_load(stream)
+            return config
         except yaml.YAMLError as exc:
+            # Log any errors that occur during YAML parsing
             print(exc)
-    return config
+            return {}  # Return an empty dictionary if an error occurs
 
-def setup_environment_variables(config):
+def setup_environment_variables(config: dict):
+    """
+    Load environment variables from the specified key file.
+    
+    Args:
+        config (dict): Configuration containing the path to the key file.
+    """
     load_dotenv(config["Key_File"])
-    openai_api_key = os.getenv('OPENAI_API_KEY')
-    serpapi_api_key = os.getenv('SERPAPI_API_KEY')
-
-    if openai_api_key is not None:
-        os.environ['OPENAI_API_KEY'] = openai_api_key
-
-    if serpapi_api_key is not None:
-        os.environ['SERPAPI_API_KEY'] = serpapi_api_key

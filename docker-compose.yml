@@ -1,7 +1,31 @@
+# /app/docker-compose.yml
 version: '3.8'
 
 services:
-  chatbot:
-    build: .
-    image: INSERT_CONTAINER_IMAGE_NAME_HERE
-    container_name: INSERT_CONTAINER_NAME_HERE
+  fastapi:
+    build: 
+      context: .
+      dockerfile: dockerfile-fastapi
+    image: rag_bot_image_fastapi
+    container_name: RAG_BOT_FASTAPI
+    ports:
+      - "8000:8000"
+
+  gradio:
+    build:
+      context: .
+      dockerfile: dockerfile-gradio
+    image: rag_bot_gradio
+    container_name: RAG_BOT_GRADIO
+    ports:
+      - "7860:7860"
+
+  qdrant:
+    image: qdrant/qdrant
+    container_name: RAG_BOT_QDRANT
+    volumes:
+      - /source_dir:/target_dir
+    ports:
+     - "6333:6333"
+    environment:
+      - QDRANT_WEB_SERVER_ADDRESS=0.0.0.0:6333
