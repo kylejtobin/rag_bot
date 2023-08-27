@@ -1,0 +1,10 @@
+openai==0.28.0
+python-dotenv==1.0.0
+google_search_results==2.4.2
+pytest==7.3.1
+llama_index==0.8.31
+qdrant_client==1.4.0
+fastapi==0.103.0
+uvicorn==0.23.2
+bs4==0.0.1
+nltk==3.8.1
