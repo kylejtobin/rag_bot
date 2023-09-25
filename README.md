@@ -38,7 +38,7 @@ To set up the project:
 
 1. Clone this repository to your local machine.
 
-2. Rename `.env.example` to `.env` and add your OpenAI API key.  
+2. Rename `key.env.example` to `key.env` and add your OpenAI API key.  
 
 3. In `docker-compose.yml`, update the `volumes` path for `RAG_BOT_QDRANT` to a local folder where you want persistent storage for the vector database.
 
