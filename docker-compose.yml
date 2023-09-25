@@ -24,7 +24,7 @@ services:
     image: qdrant/qdrant
     container_name: RAG_BOT_QDRANT
     volumes:
-      - /source_dir:/target_dir
+      - c:\users\kyle\src\rag_bot\src\data\storage:/app/src/data/storage
     ports:
      - "6333:6333"
     environment:
