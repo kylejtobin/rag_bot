@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+env/
+*.venv
+*.env
+
+# Encrypted API key
+/api_key.txt
+/encrypted_api_key.bin
+
+# Log files
+*.log
+logs/
+
+# User-specific files
+.DS_Store
+*.swp
+Thumbs.db
+
+# IDE/Editor specific files
+.vscode/
+.idea/
+*.sublime*
+*.sln
+*.suo
+*.cache
+*.log
+*.nupkg
+*.ncrunch*
+*.dotCover
+*.resharper*
+
+# Exclude encrypted API key files
+*.bin
+
+# Exclude configuration files
+alfred_config.sh
