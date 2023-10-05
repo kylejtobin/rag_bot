@@ -57,7 +57,7 @@ Once the Docker containers are up and running, you can start interacting with th
 
 - The **interactive Swagger docs** at [http://localhost:8000/docs](http://localhost:8000/docs)
 - The **Gradio Chat Interface** at [http://localhost:7860](http://localhost:7860)
-- The **Qdrant Web Interface** at [http://localhost:](http://localhost:6333/dashboard)
+- The **Qdrant Web Interface** at [http://localhost:6333/dashboard](http://localhost:6333/dashboard)
 
 
 ## 🏗 **Architecture Overview**
