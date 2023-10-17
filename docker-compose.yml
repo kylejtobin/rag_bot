@@ -11,7 +11,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - $PWD:/app # mount current directory to container for hot reloading of code changes
+      - $PWD:/app # Mount current directory to container for hot reloading of code changes
 
   gradio:
     build:
