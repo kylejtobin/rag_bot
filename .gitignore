@@ -41,3 +41,6 @@ Thumbs.db
 
 # Exclude configuration files
 alfred_config.sh
+
+# Exclude application data
+.data/
