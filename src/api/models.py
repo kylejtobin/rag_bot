@@ -34,7 +34,7 @@ class ScrapeRequest(BaseModel):
     Attributes:
     url (str): The URL of the web page to be scraped.
     """
-    url: str
+    url: str = 'https://github.com/kylejtobin/rag_bot'
 
 
 class ScrapeResponse(BaseModel):
