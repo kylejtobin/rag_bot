@@ -59,6 +59,24 @@ Once the Docker containers are up and running, you can start interacting with th
 - The **Gradio Chat Interface** at [http://localhost:7860](http://localhost:7860)
 - The **Qdrant Web Interface** at [http://localhost:6333/dashboard](http://localhost:6333/dashboard)
 
+### Build the TechDocs Collection
+1. **Scrape Documents:**
+    - Go to the FastAPI server by navigating to the interactive Swagger docs at [http://localhost:8000/docs](http://localhost:8000/docs).
+    - Use the `scrape` endpoint to scrape content from a specified URL. You will need to provide the URL you want to scrape in the request body.
+    - The `scrape` endpoint will return the scraped content which will be processed in the next step.
+![Scraper](img/scape.png)
+
+2. **Create a Vector Index:**
+    - Use the `process-documents` endpoint to create a vector index from the scraped content.
+    - In case the `techdocs` collection does not exist, the `process-documents` endpoint will create one for you.
+    - This endpoint will process the scraped documents, create a vector index, and load it into Qdrant.
+![Process Documents](img/process-docs.png)
+3. **Interact with Processed Documents:**
+    - Now that the documents are processed and loaded into Qdrant, you can start interacting with them.
+    - Try chatting with the documents via the Gradio Chat Interface at [http://localhost:7860](http://localhost:7860).
+    - The bot should automatically check the `techdocs` collection for technical information while responding to your queries. If it doesn't, you can instruct the bot by typing "check techdocs" in the chat interface.
+![TechDocs Chat](img/chat-with-docs.png)
+
 
 ## 🏗 **Architecture Overview**
 
