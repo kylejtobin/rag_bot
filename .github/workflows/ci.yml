@@ -36,6 +36,21 @@ jobs:
 
         - name: Start services
           run: docker-compose up -d
+          shell: bash
+
+        - name: Wait for the container to be reachable
+          run: |
+            for i in {1..30}; do 
+            if curl -s http://127.0.0.1:8000/docs; then
+                echo "Container is up!"
+                exit 0
+            else
+                echo "Waiting for container..."
+                sleep 1
+            fi
+            done
+            echo "Container did not start in time!"
+            exit 1
 
         # - name: Run integration tests
         #   run: |
