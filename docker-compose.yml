@@ -11,7 +11,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - $PWD:/app # Mount current directory to container for hot reloading of code changes
+      - .:/app # Mount current directory to container for hot reloading of code changes
 
   gradio:
     build:
@@ -39,4 +39,4 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: $PWD/.data/qdrant/
+      device: ./.data/qdrant/
