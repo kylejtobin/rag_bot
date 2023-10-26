@@ -5,7 +5,7 @@ from src.utils.config import load_config, setup_environment_variables
 from src.tools.setup import ToolSetup
 
 # Primary Components
-from langchain import LLMChain
+from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.agents import ZeroShotAgent, AgentExecutor
