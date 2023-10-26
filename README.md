@@ -42,6 +42,11 @@ To set up the project:
 
 3. In `docker-compose.yml`, update the `volumes` path for `RAG_BOT_QDRANT` to a local folder where you want persistent storage for the vector database.
 
+4. Create needed directories for persistant storage
+   ```bash
+   mkdir -p .data/qdrant/
+   ```
+
 4. Build the Docker images:
    ```bash
     docker-compose build

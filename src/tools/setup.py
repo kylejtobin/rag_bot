@@ -1,7 +1,7 @@
 # /app/src/tools/setup.py
 
 # Primary Components 
-from langchain import SerpAPIWrapper
+from langchain.utilities import SerpAPIWrapper
 from langchain.agents import Tool
 
 from src.tools.doc_search import DocumentSearch

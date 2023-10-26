@@ -13,7 +13,7 @@ class ChatInput(BaseModel):
     Attributes:
     user_input (str): The input string from the user to the chat.
     """
-    user_input: str
+    user_input: str = "What are the basic steps to get rag_bot up and running?" # Example chat which will normally hit qdrant
 
 
 class ChatOutput(BaseModel):
@@ -34,7 +34,7 @@ class ScrapeRequest(BaseModel):
     Attributes:
     url (str): The URL of the web page to be scraped.
     """
-    url: str
+    url: str = 'https://github.com/kylejtobin/rag_bot'
 
 
 class ScrapeResponse(BaseModel):
@@ -90,5 +90,5 @@ class DocumentSearchRequest(BaseModel):
     user_input (str): The user input query for searching documents.
     """
     collection_name: str
-    user_input: str
+    user_input: str 
 
