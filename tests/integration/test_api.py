@@ -5,7 +5,7 @@ import time
 # ToDo: Support multi-chat sessions and then make integration tests run in parallel
 
 # Define the base URL of your FastAPI application
-BASE_URL = "http://localhost:8000"
+BASE_URL = "http://RAG_BOT_FASTAPI:8000"
 
 
 def test_basic_chat_hi_no_rag():

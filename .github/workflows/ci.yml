@@ -1,9 +1,9 @@
-name: Set up and start Docker services
+name: CI
 
 on: [push, pull_request]
 
 jobs:
-  setup-and-start:
+  CI:
     runs-on: ubuntu-latest
     
     steps:
@@ -37,23 +37,9 @@ jobs:
         - name: Start services
           run: docker-compose up -d
 
-        - name: Wait for the container to be reachable
+        - name: Run integration tests
           run: |
-            for i in {1..30}; do # Try for up to 30 seconds (30 retries with 1-second sleep)
-            if docker exec -t RAG_BOT_FASTAPI curl -s http://0.0.0.0:8000/docs; then
-                echo "Container is up!"
-                exit 0
-            else
-                echo "Waiting for container..."
-                sleep 1
-            fi
-            done
-            echo "Container did not start in time!"
-            # exit 1
-
-        - name: Run tests
-          run: |
-            docker exec -t RAG_BOT_FASTAPI pytest -v
+            docker exec -t RAG_BOT_FASTAPI pytest -v tests/integration/
 
         - name: Display Docker Container Logs on Failure
           if: failure()
