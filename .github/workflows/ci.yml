@@ -58,6 +58,10 @@ jobs:
             echo "Container did not start in time!"
             # exit 1
 
+        - name: Run tests
+          run: |
+            docker exec -t RAG_BOT_FASTAPI pytest -v
+
         - name: Display Docker Container Logs on Failure
           if: failure()
           run: |
