@@ -7,24 +7,38 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+        - name: Checkout code
+          uses: actions/checkout@v2
 
-      - name: Rename key.env.example to key.env
-        run: mv key.env.example key.env
-        # Note: You might want to populate key.env via secrets or some other method if it has sensitive data.
+        - name: Cache Docker layers
+          uses: actions/cache@v2
+          with:
+            path: /tmp/docker-save
+            key: ${{ runner.os }}-docker-${{ github.sha }}
+            restore-keys: |
+                ${{ runner.os }}-docker-
+        
+        - name: Load Docker layers
+          run: |
+            if [ -f /tmp/docker-save/image.tar ]; then
+                docker load -i /tmp/docker-save/image.tar
+            fi
 
-      - name: Create directories for persistent storage
-        run: mkdir -p .data/qdrant/
+        - name: Rename key.env.example to key.env
+          run: mv key.env.example key.env
+          # Note: You might want to populate key.env via secrets or some other method if it has sensitive data.
 
-      - name: Build Docker images
-        run: docker-compose build
+        - name: Create directories for persistent storage
+          run: mkdir -p .data/qdrant/
 
-      - name: Start services
-        run: docker-compose up -d
+        - name: Build Docker images
+          run: docker-compose build
 
-      - name: Wait for the container to be reachable
-        run: |
+        - name: Start services
+          run: docker-compose up -d
+
+        - name: Wait for the container to be reachable
+          run: |
             for i in {1..30}; do # Try for up to 30 seconds (30 retries with 1-second sleep)
             if curl -s http://localhost:8000/docs; then
                 echo "Container is up!"
