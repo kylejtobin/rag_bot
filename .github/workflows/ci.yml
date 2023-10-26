@@ -34,15 +34,8 @@ jobs:
         - name: Build Docker images
           run: docker-compose build
 
-        
-        - name: Save all Docker layers
-          run: |
-            mkdir -p /tmp/docker-save
-            docker save -o /tmp/docker-save/image.tar rag_bot_image_fastapi rag_bot_gradio
-
         - name: Start services
           run: docker-compose up -d
-
 
         - name: Wait for the container to be reachable
           run: |
