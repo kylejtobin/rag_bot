@@ -1,0 +1,63 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+
+        - name: Cache Docker layers
+          uses: actions/cache@v2
+          with:
+            path: /tmp/docker-save
+            key: ${{ runner.os }}-docker-${{ github.sha }}
+            restore-keys: |
+                ${{ runner.os }}-docker-
+        
+        - name: Load Docker layers
+          run: |
+            if [ -f /tmp/docker-save/image.tar ]; then
+                docker load -i /tmp/docker-save/image.tar
+            fi
+
+        - name: Rename key.env.example to key.env
+          run: mv key.env.example key.env
+          # Note: You might want to populate key.env via secrets or some other method if it has sensitive data.
+
+        - name: Create directories for persistent storage
+          run: mkdir -p .data/qdrant/
+
+        - name: Build Docker images
+          run: docker-compose build
+
+        - name: Start services
+          run: docker-compose up -d
+          shell: bash
+
+        # - name: Wait for the container to be reachable
+        #   run: |
+        #     for i in {1..30}; do 
+        #     if curl -s http://127.0.0.1:8000/docs; then
+        #         echo "Container is up!"
+        #         exit 0
+        #     else
+        #         echo "Waiting for container..."
+        #         sleep 1
+        #     fi
+        #     done
+        #     echo "Container did not start in time!"
+        #     exit 1
+
+        # - name: Run integration tests
+        #   run: |
+        #     docker exec -t RAG_BOT_FASTAPI pytest -v tests/integration/
+
+        - name: Display Docker Container Logs on Failure
+          if: failure()
+          run: |
+            docker ps -a
+            docker logs RAG_BOT_FASTAPI
