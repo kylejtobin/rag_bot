@@ -44,3 +44,4 @@ alfred_config.sh
 
 # Exclude application data
 .data/
+src/scraper/out/
