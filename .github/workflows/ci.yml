@@ -56,6 +56,11 @@ jobs:
             echo "Container did not start in time!"
             exit 1
 
+        - name: Save all Docker layers
+          run: |
+            mkdir -p /tmp/docker-save
+            docker save -o /tmp/docker-save/image.tar rag_bot_image_fastapi rag_bot_gradio
+
         - name: Display Docker Container Logs on Failure
           if: failure()
           run: |
