@@ -355,5 +355,5 @@ API tests are provided in `./tests/integration`
 
 To run the API tests, first ensure you've started up the application with docker-compose, then run the below command to execute tests from withing docker container with deps installed.
 ```
-docker exec -it RAG_BOT_FASTAPI pytest
+docker exec -t RAG_BOT_FASTAPI pytest -v
 ```

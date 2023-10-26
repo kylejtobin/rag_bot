@@ -1,0 +1,48 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+
+        - name: Cache Docker layers
+          uses: actions/cache@v2
+          with:
+            path: /tmp/docker-save
+            key: ${{ runner.os }}-docker-${{ github.sha }}
+            restore-keys: |
+                ${{ runner.os }}-docker-
+        
+        - name: Load Docker layers
+          run: |
+            if [ -f /tmp/docker-save/image.tar ]; then
+                docker load -i /tmp/docker-save/image.tar
+            fi
+
+        - name: Rename key.env.example to key.env
+          run: mv key.env.example key.env
+          # Note: You might want to populate key.env via secrets or some other method if it has sensitive data.
+
+        - name: Create directories for persistent storage
+          run: mkdir -p .data/qdrant/
+
+        - name: Build Docker images
+          run: docker-compose build
+
+        - name: Start services
+          run: docker-compose up -d
+
+        # - name: Run integration tests
+        #   run: |
+        #     docker exec -t RAG_BOT_FASTAPI pytest -v tests/integration/
+
+        - name: Display Docker Container Logs on Failure
+          if: failure()
+          run: |
+            docker ps -a
+            docker logs RAG_BOT_FASTAPI
