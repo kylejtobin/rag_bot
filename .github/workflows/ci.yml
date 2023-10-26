@@ -1,0 +1,44 @@
+name: Set up and start Docker services
+
+on:
+  push: 
+    branches:
+      - '*' 
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  setup-and-start:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Rename key.env.example to key.env
+        run: mv key.env.example key.env
+        # Note: You might want to populate key.env via secrets or some other method if it has sensitive data.
+
+      - name: Create directories for persistent storage
+        run: mkdir -p .data/qdrant/
+
+      - name: Build Docker images
+        run: docker-compose build
+
+      - name: Start services
+        run: docker-compose up -d
+
+      - name: Wait for the container to be reachable
+        run: |
+            for i in {1..30}; do # Try for up to 30 seconds (30 retries with 1-second sleep)
+            if curl -s http://localhost:8000/docs; then
+                echo "Container is up!"
+                exit 0
+            else
+                echo "Waiting for container..."
+                sleep 1
+            fi
+            done
+            echo "Container did not start in time!"
+            exit 1
