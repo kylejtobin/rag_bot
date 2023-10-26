@@ -37,9 +37,14 @@ jobs:
         - name: Start services
           run: docker-compose up -d
 
+        - name: Wait for docker
+          run: docker-compose ps
+          timeout-minutes: 2
+
+
         - name: Wait for the container to be reachable
           run: |
-            for i in {1..30}; do # Try for up to 30 seconds (30 retries with 1-second sleep)
+            for i in {1..60}; do # Try for up to 30 seconds (30 retries with 1-second sleep)
             if curl -s http://localhost:8000/docs; then
                 echo "Container is up!"
                 exit 0
@@ -50,3 +55,9 @@ jobs:
             done
             echo "Container did not start in time!"
             exit 1
+
+        - name: Display Docker Container Logs on Failure
+          if: failure()
+          run: |
+            docker ps -a
+            docker logs <YOUR_CONTAINER_NAME>
