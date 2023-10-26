@@ -60,4 +60,4 @@ jobs:
           if: failure()
           run: |
             docker ps -a
-            docker logs <YOUR_CONTAINER_NAME>
+            docker logs rag_bot_image_fastapi
