@@ -45,7 +45,7 @@ jobs:
         - name: Wait for the container to be reachable
           run: |
             for i in {1..60}; do # Try for up to 30 seconds (30 retries with 1-second sleep)
-            if curl -s http://localhost:8000/docs; then
+            if curl -s http://0.0.0.0:8000/docs; then
                 echo "Container is up!"
                 exit 0
             else
