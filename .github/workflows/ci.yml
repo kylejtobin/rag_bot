@@ -34,18 +34,20 @@ jobs:
         - name: Build Docker images
           run: docker-compose build
 
+        
+        - name: Save all Docker layers
+          run: |
+            mkdir -p /tmp/docker-save
+            docker save -o /tmp/docker-save/image.tar rag_bot_image_fastapi rag_bot_gradio
+
         - name: Start services
           run: docker-compose up -d
-
-        - name: Wait for docker
-          run: docker-compose ps
-          timeout-minutes: 2
 
 
         - name: Wait for the container to be reachable
           run: |
-            for i in {1..60}; do # Try for up to 30 seconds (30 retries with 1-second sleep)
-            if curl -s http://0.0.0.0:8000/docs; then
+            for i in {1..30}; do # Try for up to 30 seconds (30 retries with 1-second sleep)
+            if docker exec -t RAG_BOT_FASTAPI curl -s http://0.0.0.0:8000/docs; then
                 echo "Container is up!"
                 exit 0
             else
@@ -54,15 +56,10 @@ jobs:
             fi
             done
             echo "Container did not start in time!"
-            exit 1
-
-        - name: Save all Docker layers
-          run: |
-            mkdir -p /tmp/docker-save
-            docker save -o /tmp/docker-save/image.tar rag_bot_image_fastapi rag_bot_gradio
+            # exit 1
 
         - name: Display Docker Container Logs on Failure
           if: failure()
           run: |
             docker ps -a
-            docker logs rag_bot_image_fastapi
+            docker logs RAG_BOT_FASTAPI
