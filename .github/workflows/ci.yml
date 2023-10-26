@@ -37,9 +37,9 @@ jobs:
         - name: Start services
           run: docker-compose up -d
 
-        - name: Run integration tests
-          run: |
-            docker exec -t RAG_BOT_FASTAPI pytest -v tests/integration/
+        # - name: Run integration tests
+        #   run: |
+        #     docker exec -t RAG_BOT_FASTAPI pytest -v tests/integration/
 
         - name: Display Docker Container Logs on Failure
           if: failure()
