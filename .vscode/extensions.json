@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        "eamodio.gitlens", 
+        "ms-azuretools.vscode-docker",
+        "ms-python.vscode-pylance",
+        "github.copilot",
+        "ms-vsliveshare.vsliveshare",
+        "ms-vscode.makefile-tools",
+        "esbenp.prettier-vscode",
+        "ms-python.python"
+    ]
+  }

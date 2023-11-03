@@ -24,7 +24,6 @@ logs/
 Thumbs.db
 
 # IDE/Editor specific files
-.vscode/
 .idea/
 *.sublime*
 *.sln
