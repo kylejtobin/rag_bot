@@ -12,7 +12,6 @@ from langchain.agents import ZeroShotAgent, AgentExecutor
 from langchain.prompts import PromptTemplate
 
 # Utilities
-from typing import Dict
 from pathlib import Path
 import logging
 import traceback
@@ -80,15 +79,15 @@ class AgentHandler:
     def _setup_prompt_template(self) -> PromptTemplate:
         """
         Construct and return the prompt template for the agent based on loaded templates and tools.
-        
+
         Returns:
             PromptTemplate: The constructed prompt template.
-            
+
         Raises:
             KeyError: If a required key is missing in self.PROMPT_TEMPLATES.
         """
         tools = self._setup_tools()  # This method returns a list of tools
-        
+
         # Extracting the templates from self.PROMPT_TEMPLATES
         try:
             prefix = self.PROMPT_TEMPLATES["prefix"]
@@ -97,26 +96,24 @@ class AgentHandler:
         except KeyError as e:
             logging.error(f"Missing key in PROMPT_TEMPLATES: {e}")
             raise
-        
+
         # Constructing the tools string and tool_names string using list comprehension
         tools_str = '\n'.join(f"{tool.name}: {tool.description}" for tool in tools)
         tool_names_str = ', '.join(tool.name for tool in tools)
-        
+
         # Replacing the placeholder with the actual tool names in the template strings
         react_cot = react_cot.replace("{tool_names}", tool_names_str)
-        
+
         # Constructing the final template string
         final_template_str = f"{prefix}\n{tools_str}\n{react_cot}\n{suffix}"
-        
+
         # Creating an instance of PromptTemplate
         prompt_template = PromptTemplate(
             input_variables=["chat_history", "input", "agent_scratchpad"],
             template=final_template_str
         )
-        
+
         return prompt_template
-
-
 
     def _setup_agent(self) -> AgentExecutor:
         """
@@ -149,6 +146,7 @@ class AgentHandler:
             tb_str = traceback.format_exception(etype=type(e), value=e, tb=e.__traceback__)
             logging.error(f"Error while chatting with agent for input '{user_input}': {''.join(tb_str)}")
             return "An error occurred."
+
 
 def get_agent_handler() -> AgentHandler:
     global _agent_instance
