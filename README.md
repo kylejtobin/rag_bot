@@ -60,6 +60,39 @@ To set up the project:
    ```
 The services will now be running.
 
+## 🔥 **Hot-Loading in Docker**
+
+Hot-loading is enabled through Docker's volume mount feature and Uvicorn's reload capability. This allows for immediate reflection of local code changes in the Docker containers.
+
+### Configuration Details:
+
+- **Docker Compose (`docker-compose.yml`):**
+  - Local directories are mounted into the Docker containers.
+  - Example volume mount configuration for a service:
+    ```yaml
+    volumes:
+      - .:/app  # Mounts the current directory to /app in the container
+    ```
+
+- **Dockerfile Configurations:**
+  - Ensure your Dockerfile copies your application and its dependencies:
+    ```Dockerfile
+    COPY . /app
+    RUN pip install -r requirements.txt
+    ```
+  - For FastAPI applications, use the Uvicorn command with the `--reload` flag:
+    ```Dockerfile
+    CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    ```
+
+### Managing Configuration:
+
+- Modify volume mounts in `docker-compose.yml` to reflect your project structure.
+- Update the Uvicorn command in your Dockerfile according to your app's entry point.
+- Rebuild your Docker images after significant changes to the Dockerfile or dependencies.
+- Use `.dockerignore` to exclude unnecessary files from being copied into your Docker images.
+
+
 ## 🚢 **Deployment and Usage**
 Once the Docker containers are up and running, you can start interacting with the bot via:
 
