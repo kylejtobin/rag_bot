@@ -5,7 +5,7 @@ Key_File: "key.env"
 OpenAI:
   chat_temp: 0.0
   llm_temp: 0.0
-  model: "gpt-4"
+  model: "gpt-4-1106-preview"
 Scraper:
   DATA_DIR: '/app/src/scraper/scraped_data'
   USER_AGENTS:
