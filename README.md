@@ -281,7 +281,7 @@ Developers can instantiate the `DocumentLoader` class with the desired source di
 
 #### Example:
 ```python
-document_loader = DocumentLoader(source_dir='/path/to/documents', collection_name='mycollection')
+document_loader = DocumentLoader(source_dir='/path/to/documents', collection='mycollection')
 index = document_loader.load_documents()  # This will load, embed, and index the documents and then move them to the output directory.
 ```
 
@@ -315,7 +315,7 @@ Developers can instantiate the `DocumentSearch` class with the desired collectio
 
 #### Example:
 ```python
-document_search = DocumentSearch(collection_name='mycollection', user_input='my query')
+document_search = DocumentSearch(collection='mycollection', user_input='my query')
 response = document_search.search_documents()  # This will perform a search on the specified collection and return the response.
 ```
 
@@ -375,7 +375,7 @@ The project incorporates three template files located in `/app/src/template` to 
 ### Additional Resources
 Developers are encour## 🛠️ **Adapt. Customize. Innovate.**
 ```python
-document_search = DocumentSearch(collection_name='mycollection', user_input='my query')
+document_search = DocumentSearch(collection='mycollection', user_input='my query')
 response = document_search.search_documents()  # This will perform a search on the specified collection and return the response.
 ```
 

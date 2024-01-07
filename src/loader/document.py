@@ -1,3 +1,4 @@
+# /src/loader/document.py
 # Custom modules
 from src.utils.config import load_config, setup_environment_variables
 
@@ -6,14 +7,15 @@ from llama_index import SimpleDirectoryReader, StorageContext, VectorStoreIndex,
 from llama_index.embeddings import LangchainEmbedding
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
-from langchain.embeddings import OpenAIEmbeddings
+from langchain_openai.embeddings import OpenAIEmbeddings
 
 # Utilities
 import logging
 import os
 import shutil
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 
 class QdrantCollectionManager:
 
@@ -40,6 +42,7 @@ class QdrantCollectionManager:
         if not QdrantCollectionManager.collection_exists(client, collection_name):
             QdrantCollectionManager.create_collection(client, collection_name, vector_size)
 
+
 class DocumentLoader:
 
     def __init__(self, source_dir='/app/src/scraper/scraped_data', collection_name="techdocs"):
@@ -47,12 +50,11 @@ class DocumentLoader:
         self.collection_name = collection_name
         self.CONFIG = load_config()
         setup_environment_variables(self.CONFIG)
-        self.embed_model = LangchainEmbedding(OpenAIEmbeddings(openai_api_key = os.getenv("OPENAI_API_KEY")))
+        self.embed_model = LangchainEmbedding(OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY")))
         self.client = QdrantClient(url="http://RAG_BOT_QDRANT:6333")
 
         if not QdrantCollectionManager.collection_exists(self.client, collection_name):
             QdrantCollectionManager.create_collection(self.client, collection_name, 1536)
-
 
     def load_documents(self):
         try:
@@ -61,10 +63,10 @@ class DocumentLoader:
             vector_store = QdrantVectorStore(client=self.client, collection_name=self.collection_name)
             storage_context = StorageContext.from_defaults(vector_store=vector_store)
             index = VectorStoreIndex.from_documents(documents, storage_context=storage_context, service_context=service_context)
-            
+
             # Move the files after successfully loading them to the vector index
             self.move_files_to_out()
-            
+
             return index
         except Exception as e:
             logging.error(f"load_documents: Error - {str(e)}")

@@ -4,6 +4,9 @@
 from pathlib import Path
 import yaml
 from dotenv import load_dotenv
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def load_config() -> dict:
