@@ -2,17 +2,16 @@
 
 # Custom modules
 from src.utils.config import load_config, setup_environment_variables
+from src.utils.embedding_selector import EmbeddingSelector, EmbeddingConfig
 
 # Primary Components
 from llama_index import VectorStoreIndex, ServiceContext
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
-from langchain_openai.embeddings import OpenAIEmbeddings
-from llama_index.embeddings import LangchainEmbedding
+
 
 # Utilities
 import logging
-import os
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +40,10 @@ class DocumentSearch:
         self.CONFIG = load_config()
         setup_environment_variables(self.CONFIG)
         self.client = QdrantClient(url="http://RAG_BOT_QDRANT:6333")
-        self.embed_model = LangchainEmbedding(OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY")))
+        # self.embed_model = OpenAIEmbedding()
+        # self.embed_model = HuggingFaceEmbedding(model_name="sentence-transformers/multi-qa-mpnet-base-dot-v1")
+        self.embedding_config = EmbeddingConfig(type=self.CONFIG["Embedding_Type"])
+        self.embed_model = EmbeddingSelector(self.embedding_config).get_embedding_model()
 
     def setup_index(self) -> VectorStoreIndex:
         """

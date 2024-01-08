@@ -43,18 +43,20 @@ To set up the project:
 
 2. Rename `key.env.example` to `key.env` and add your OpenAI API key.  
 
-3. In `docker-compose.yml`, update the `volumes` path for `RAG_BOT_QDRANT` to a local folder where you want persistent storage for the vector database.
+3. Review `config.yml` and choose `openai` or `local` for your `Embedding_Type`
 
-4. Create needed directories for persistant storage
+4. In `docker-compose.yml`, update the `volumes` path for `RAG_BOT_QDRANT` to a local folder where you want persistent storage for the vector database.
+
+5. Create needed directories for persistant storage
    ```bash
    mkdir -p .data/qdrant/
    ```
 
-4. Build the Docker images:
+6. Build the Docker images:
    ```bash
     docker-compose build
     ```
-5. Start the services:
+7. Start the services:
    ```bash
    docker-compose up -d
    ```
@@ -328,11 +330,11 @@ The `tools` module is designed to enhance the agent's capabilities by integratin
   - The module allows for the incorporation of various libraries and APIs, enabling the agent to access and leverage external functionalities and data.
 
 - **Contextual Conversations:**
-  - Tools like `SerpAPI` and `DocumentSearch` enable the agent to access real-time, relevant information, allowing for more informed and context-aware conversations.
+  - Tools like `DuckDuckGoSearch` and `DocumentSearch` enable the agent to access real-time, relevant information, allowing for more informed and context-aware conversations.
 
 #### Included Tools:
-1. **SerpAPI Search Wrapper:**
-   - Conducts Google searches to retrieve real-time search results programmatically.
+1. **DuckDuckGo Search Wrapper:**
+   - Conducts DuckDuckGo searches to retrieve real-time search results programmatically.
    - Useful for obtaining current and relevant web information for user queries.
 
 2. **Document Searcher:**
@@ -378,64 +380,6 @@ Developers are encour## 🛠️ **Adapt. Customize. Innovate.**
 document_search = DocumentSearch(collection='mycollection', user_input='my query')
 response = document_search.search_documents()  # This will perform a search on the specified collection and return the response.
 ```
-
-### Tools Module Overview
-
-The `tools` module is designed to enhance the agent's capabilities by integrating external libraries, APIs, and custom functionalities. It serves as a practical extension point for developers looking to customize and extend the agent's abilities.
-
-#### Key Features:
-- **Integration of External Libraries and APIs:**
-  - The module allows for the incorporation of various libraries and APIs, enabling the agent to access and leverage external functionalities and data.
-
-- **Contextual Conversations:**
-  - Tools like `SerpAPI` and `DocumentSearch` enable the agent to access real-time, relevant information, allowing for more informed and context-aware conversations.
-
-#### Included Tools:
-1. **SerpAPI Search Wrapper:**
-   - Conducts Google searches to retrieve real-time search results programmatically.
-   - Useful for obtaining current and relevant web information for user queries.
-
-2. **Document Searcher:**
-   - Queries specialized vector stores like ‘TechDocs’ for technical documentation.
-   - Useful for addressing technical inquiries by providing relevant context and information.
-
-#### Customization and Extension:
-- Developers can modify existing tools or create new ones to meet specific needs, allowing for a high degree of customization and adaptability.
-
-#### Usage:
-The `ToolSetup` class is used to initialize and set up tools. Developers can leverage this class to equip the agent with a variety of tools that can be invoked based on the conversational context to enhance the agent's responses.
-
-#### Evolution:
-The `tools` module is dynamic and can be continually refined and expanded. Developers are encouraged to explore new integrations and enhancements to keep improving the agent's capabilities.
-
-## 🛠️ **Prompt Engineering**
-
-Prompt Engineering is a pivotal process in developing conversational agents, focusing on optimizing the prompts sent to Language Models (LLMs) to elicit desired responses. It involves utilizing template files and leveraging platforms and resources to refine interactions with LLMs.
-
-Developers should leverage the template files and the LangSmith platform along with the additional resources to enhance the prompt engineering process, ensuring optimized interactions with LLMs and refined conversational experiences.
-
-### Template Files
-The project incorporates three template files located in `/app/src/template` to define the interaction dynamics:
-1. **prefix.txt:** Defines the bot's personality and tool access.
-2. **react_cot.txt:** Outlines the chain of thought reasoning.
-3. **suffix.txt:** Allocates space for the agent scratchpad, memory, and user input.
-
-### LangSmith Platform
-[LangSmith](https://smith.langchain.com) is an integral platform designed to assist developers in building, debugging, testing, evaluating, and refining LLM-powered applications. It provides a suite of tools focusing on visibility, workflows, and extensibility, making it an indispensable resource for developing production-ready LLM applications.
-
-#### Key Features:
-- **Debugging:** Full visibility into prompts and responses, latency and token usage tracking, and a playground UI for tweaking prompts.
-- **Testing:** Allows the creation and running of chains/prompts over datasets for manual review.
-- **Evaluating:** Integrates with open-source evaluation modules.
-- **Monitoring:** Tracks system metrics and user interactions, and associates user feedback with model runs.
-- **Unified Platform:** Connects workflows and allows export of logs and datasets for integration with other tools.
-
-![LangSmith](img/langsmith.png)
-
-### Additional Resources
-Developers are encouraged to explore the following resources for more insights and guidance on prompt engineering:
-- [Prompting Engineering Guide](https://www.promptingguide.ai/): An educational project by DAIR.AI focusing on prompt engineering.
-- [LangChain Hub](https://smith.langchain.com/hub): A centralized platform for managing prompts.
 
 ## 🚧 **Customization and Extendability**
 While the project provides a solid architecture, there are ample opportunities for customization and extensibility:

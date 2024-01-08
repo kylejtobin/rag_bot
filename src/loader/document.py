@@ -1,13 +1,13 @@
 # /src/loader/document.py
 # Custom modules
 from src.utils.config import load_config, setup_environment_variables
+from src.utils.embedding_selector import EmbeddingSelector, EmbeddingConfig
 
 # Primary Components
 from llama_index import SimpleDirectoryReader, StorageContext, VectorStoreIndex, ServiceContext
-from llama_index.embeddings import LangchainEmbedding
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
-from langchain_openai.embeddings import OpenAIEmbeddings
+
 
 # Utilities
 import logging
@@ -45,16 +45,18 @@ class QdrantCollectionManager:
 
 class DocumentLoader:
 
-    def __init__(self, source_dir='/app/src/scraper/scraped_data', collection_name="techdocs"):
+    def __init__(self, source_dir='/app/src/scraper/scraped_data', collection="techdocs"):
         self.source_dir = source_dir
-        self.collection_name = collection_name
+        self.collection_name = collection
         self.CONFIG = load_config()
         setup_environment_variables(self.CONFIG)
-        self.embed_model = LangchainEmbedding(OpenAIEmbeddings(openai_api_key=os.getenv("OPENAI_API_KEY")))
+        self.embedding_config = EmbeddingConfig(type=self.CONFIG["Embedding_Type"])
+        self.embed_model = EmbeddingSelector(self.embedding_config).get_embedding_model()
+
         self.client = QdrantClient(url="http://RAG_BOT_QDRANT:6333")
 
-        if not QdrantCollectionManager.collection_exists(self.client, collection_name):
-            QdrantCollectionManager.create_collection(self.client, collection_name, 1536)
+        if not QdrantCollectionManager.collection_exists(self.client, collection):
+            QdrantCollectionManager.create_collection(self.client, collection, self.CONFIG["Qdrant"]["vector_size"])
 
     def load_documents(self):
         try:
@@ -71,12 +73,12 @@ class DocumentLoader:
         except Exception as e:
             logging.error(f"load_documents: Error - {str(e)}")
             raise e
-    
+
     def move_files_to_out(self):
         out_dir = '/app/src/scraper/out'
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
-        
+
         for filename in os.listdir(self.source_dir):
             file_path = os.path.join(self.source_dir, filename)
             if os.path.isfile(file_path):
