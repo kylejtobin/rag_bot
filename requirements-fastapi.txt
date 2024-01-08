@@ -12,3 +12,4 @@ langchain==0.1.0
 duckduckgo-search==4.1.1
 langchainhub==0.1.14
 langchain_openai==0.0.2
+sentence-transformers==2.2.2

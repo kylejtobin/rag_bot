@@ -80,7 +80,7 @@ def handle_process_documents(data: DocumentLoaderRequest) -> DocumentLoaderRespo
     """
     try:
         processor = DocumentLoader(source_dir=data.source_dir, collection=data.collection)
-        processor.load_documents()  # This should block until processing is complete
+        processor.load_documents()  
         return DocumentLoaderResponse(status="success", message="Documents processed successfully")
     except Exception as e:
         logging.error(f"Error processing documents: {str(e)}")
