@@ -17,8 +17,8 @@ def chat_with_bot(user_input: str) -> str:
 
 # Gradio Interface
 iface = gr.Interface(
-    fn=chat_with_bot, 
-    inputs="text", 
+    fn=chat_with_bot,
+    inputs="text",
     outputs="text"
 )
 

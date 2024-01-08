@@ -1,23 +1,14 @@
 # /app/src/api/routes.py
+import logging
 
-# Internal Modules
-from src.api.models import (
-    ChatInput,
-    ScrapeRequest,
-    DocumentLoaderRequest,
-    ChatOutput,
-    ScrapeResponse,
-    DocumentLoaderResponse,
-    DocumentSearchRequest
-)
-from src.api.handlers import handle_chat, handle_scrape, handle_process_documents, handle_document_search
-from src.agent.agent_handler import get_agent_handler
-
-# Primary Components
 from fastapi import APIRouter
 
-# Utilities
-import logging
+from src.agent.agent_handler import get_agent_handler
+from src.api.handlers import (handle_chat, handle_document_search,
+                              handle_process_documents, handle_scrape)
+from src.api.models import (ChatInput, ChatOutput, DocumentLoaderRequest,
+                            DocumentLoaderResponse, DocumentSearchRequest,
+                            ScrapeRequest, ScrapeResponse)
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +23,7 @@ def chat_endpoint(data: ChatInput):
     """
     Endpoint to interact with the chat agent.
 
-    This function receives user input, passes it to the chat handler, 
+    This function receives user input, passes it to the chat handler,
     and returns the chat agent's response.
 
     Args:
@@ -71,16 +62,16 @@ def process_documents_endpoint(data: DocumentLoaderRequest) -> DocumentLoaderRes
     """
     Endpoint to initiate the document loading process.
 
-    This function receives the source directory and the collection name, 
-    passes them to the document loader handler, and returns the status of the 
+    This function receives the source directory and the collection name,
+    passes them to the document loader handler, and returns the status of the
     processed files encapsulated in a DocumentLoaderResponse object.
 
     Args:
-    data (DocumentLoaderRequest): The data containing the source directory 
+    data (DocumentLoaderRequest): The data containing the source directory
                                   and the collection name to which the documents should be loaded.
 
     Returns:
-    DocumentLoaderResponse: A response object containing the status of the document 
+    DocumentLoaderResponse: A response object containing the status of the document
                             loading process and an optional message.
     """
     return handle_process_documents(data)

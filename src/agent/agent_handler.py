@@ -1,24 +1,19 @@
 # src/agent/agent_handler.py
-
-# Custom module imports for config and tool setup
-from src.utils.config import load_config, setup_environment_variables
-from src.tools.setup import ToolSetup
-
-# LangChain imports based on the provided code example
-from langchain.agents import AgentExecutor
-from langchain.agents.output_parsers import ReActSingleInputOutputParser
-from langchain_openai import ChatOpenAI
-from langchain.memory import ConversationBufferMemory
-from langchain.agents.format_scratchpad import format_log_to_str
-from langchain_core.prompts import PromptTemplate
-
-# Standard library imports
 import logging
 import traceback
 from pathlib import Path
 
-logger = logging.getLogger(__name__)
+from langchain.agents import AgentExecutor
+from langchain.agents.format_scratchpad import format_log_to_str
+from langchain.agents.output_parsers import ReActSingleInputOutputParser
+from langchain.memory import ConversationBufferMemory
+from langchain_core.prompts import PromptTemplate
+from langchain_openai import ChatOpenAI
 
+from src.tools.setup import ToolSetup
+from src.utils.config import load_config, setup_environment_variables
+
+logger = logging.getLogger(__name__)
 
 # Global variable to store the agent handler instance
 _agent_instance = None
@@ -34,7 +29,7 @@ class AgentHandler:
         self.llm = ChatOpenAI(model=self.CONFIG["OpenAI"]["model"], temperature=self.CONFIG["OpenAI"]["llm_temp"])
         self.memory = ConversationBufferMemory(memory_key="chat_history")
         self.tools = ToolSetup.setup_tools()
-        self._load_prompt_templates() 
+        self._load_prompt_templates()
         self.agent_executor = self._initialize_agent_executor()
 
     def _load_prompt_templates(self):

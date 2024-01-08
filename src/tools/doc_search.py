@@ -1,17 +1,13 @@
 # /app/src/tools/doc_search.py
-
-# Custom modules
-from src.utils.config import load_config, setup_environment_variables
-from src.utils.embedding_selector import EmbeddingSelector, EmbeddingConfig
+import logging
 
 # Primary Components
-from llama_index import VectorStoreIndex, ServiceContext
+from llama_index import ServiceContext, VectorStoreIndex
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 
-
-# Utilities
-import logging
+from src.utils.config import load_config, setup_environment_variables
+from src.utils.embedding_selector import EmbeddingConfig, EmbeddingSelector
 
 logger = logging.getLogger(__name__)
 

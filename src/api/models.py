@@ -1,9 +1,8 @@
 # /app/src/api/models.py
-
-# Utilities
-from pydantic import BaseModel
-from typing import Optional
 import logging
+from typing import Optional
+
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
@@ -45,9 +44,9 @@ class ScrapeResponse(BaseModel):
     Model representing the response from the web scraping process.
 
     Attributes:
-    message (str): The status message indicating the success or failure 
+    message (str): The status message indicating the success or failure
                    of the scraping process.
-    data (Optional[str]): The scraped data from the web page if the 
+    data (Optional[str]): The scraped data from the web page if the
                           scraping process is successful. None, if unsuccessful.
     """
     message: str
@@ -60,9 +59,9 @@ class DocumentLoaderResponse(BaseModel):
     Model representing the response from the document loading process.
 
     Attributes:
-    status (str): The status of the document loading process. 
+    status (str): The status of the document loading process.
                   It will be 'success' if the documents are processed successfully.
-    message (Optional[str]): Optional message field to convey any additional 
+    message (Optional[str]): Optional message field to convey any additional
                              information or details about the process.
     """
     status: str
@@ -74,9 +73,9 @@ class DocumentLoaderRequest(BaseModel):
     Model representing the request to initiate document loading.
 
     Attributes:
-    source_dir (str): The directory from where the documents are to be loaded. 
+    source_dir (str): The directory from where the documents are to be loaded.
                       Default is set to the directory where scraped data is stored.
-    collection (str): The name of the collection to which the documents 
+    collection (str): The name of the collection to which the documents
                            should be loaded. Default is "techdocs".
     """
     source_dir: str = '/app/src/scraper/scraped_data'

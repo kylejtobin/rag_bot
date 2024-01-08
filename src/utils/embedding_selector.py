@@ -1,3 +1,4 @@
+# /app/src/utils/embedding_selector.py
 from pydantic import BaseModel
 from typing import Optional
 from src.utils.config import load_config
