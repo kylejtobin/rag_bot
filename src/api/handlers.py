@@ -1,17 +1,16 @@
 # /app/src/api/handlers.py
 
-# Internal Modules
-from src.agent.agent_handler import AgentHandler, get_agent_handler
-from src.scraper.scraper import run_web_scraper
-from src.loader.document import DocumentLoader
-from src.tools.doc_search import DocumentSearch
-from src.api.models import ChatInput, DocumentLoaderRequest, DocumentLoaderResponse, ScrapeRequest, DocumentSearchRequest
+import logging
 
-# Primary Components
 from fastapi import Depends, HTTPException
 
-# Utilities
-import logging
+from src.agent.agent_handler import AgentHandler, get_agent_handler
+from src.api.models import (ChatInput, DocumentLoaderRequest,
+                            DocumentLoaderResponse, DocumentSearchRequest,
+                            ScrapeRequest)
+from src.loader.document import DocumentLoader
+from src.scraper.scraper import run_web_scraper
+from src.tools.doc_search import DocumentSearch
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +21,7 @@ def handle_chat(data: ChatInput, agent: AgentHandler = Depends(get_agent_handler
 
     Args:
         data (ChatInput): The user input data
-        agent (AgentHandler): The AgentHandler instance  
+        agent (AgentHandler): The AgentHandler instance
 
     Returns:
         dict: Response from agent
@@ -62,9 +61,9 @@ def handle_process_documents(data: DocumentLoaderRequest) -> DocumentLoaderRespo
     """
     Processes documents from a specified source directory and loads them into a collection.
 
-    This function initiates a DocumentLoader with the specified source directory and 
-    collection name from the DocumentLoaderRequest object. It then loads the documents 
-    from the source directory into the specified collection. If there are any errors during 
+    This function initiates a DocumentLoader with the specified source directory and
+    collection name from the DocumentLoaderRequest object. It then loads the documents
+    from the source directory into the specified collection. If there are any errors during
     the process, it raises an HTTPException.
 
     Args:
@@ -72,7 +71,7 @@ def handle_process_documents(data: DocumentLoaderRequest) -> DocumentLoaderRespo
                                   collection name to which the documents should be loaded.
 
     Returns:
-    DocumentLoaderResponse: A response object containing the status of the document 
+    DocumentLoaderResponse: A response object containing the status of the document
                             loading process and an optional message.
 
     Raises:
@@ -80,7 +79,7 @@ def handle_process_documents(data: DocumentLoaderRequest) -> DocumentLoaderRespo
     """
     try:
         processor = DocumentLoader(source_dir=data.source_dir, collection=data.collection)
-        processor.load_documents()  
+        processor.load_documents()
         return DocumentLoaderResponse(status="success", message="Documents processed successfully")
     except Exception as e:
         logging.error(f"Error processing documents: {str(e)}")
@@ -92,10 +91,10 @@ def handle_document_search(data: DocumentSearchRequest) -> str:
     """Handles document search request and returns the raw response.
 
     This function receives a DocumentSearchRequest containing the collection
-    name and user query input. It instantiates a DocumentSearch object and 
+    name and user query input. It instantiates a DocumentSearch object and
     calls search_documents() to perform the actual search.
 
-    The search_documents() method is returning a raw string response rather 
+    The search_documents() method is returning a raw string response rather
     than a list of results. So this handler simply returns the raw string.
 
     No iteration or post-processing is done on the result string. The client

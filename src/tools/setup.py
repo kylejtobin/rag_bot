@@ -1,14 +1,11 @@
 # /app/src/tools/setup.py
+import logging
 
-# Primary Components
 from langchain.pydantic_v1 import BaseModel, Field
 from langchain.tools import BaseTool
 from langchain_community.tools import DuckDuckGoSearchResults
 
 from src.tools.doc_search import DocumentSearch
-
-# Utilities
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +28,7 @@ class SearchWebTool(BaseTool):
     def _run(self, query: str, **kwargs) -> str:
         search = DuckDuckGoSearchResults()
         return search.run(query)
-    
+
 
 class SearchTechDocsTool(BaseTool):
     name = "search_techdocs"

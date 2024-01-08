@@ -1,18 +1,15 @@
 # /src/loader/document.py
-# Custom modules
-from src.utils.config import load_config, setup_environment_variables
-from src.utils.embedding_selector import EmbeddingSelector, EmbeddingConfig
-
-# Primary Components
-from llama_index import SimpleDirectoryReader, StorageContext, VectorStoreIndex, ServiceContext
-from llama_index.vector_stores.qdrant import QdrantVectorStore
-from qdrant_client import QdrantClient
-
-
-# Utilities
 import logging
 import os
 import shutil
+
+from llama_index import (ServiceContext, SimpleDirectoryReader, StorageContext,
+                         VectorStoreIndex)
+from llama_index.vector_stores.qdrant import QdrantVectorStore
+from qdrant_client import QdrantClient
+
+from src.utils.config import load_config, setup_environment_variables
+from src.utils.embedding_selector import EmbeddingConfig, EmbeddingSelector
 
 logger = logging.getLogger(__name__)
 
