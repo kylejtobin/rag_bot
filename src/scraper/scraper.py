@@ -1,31 +1,30 @@
 # /app/src/scraper/scraper_main.py
-
-# Custom modules
-from src.utils.config import load_config
-
-# Primary Modules
-from urllib.parse import urlparse
-from requests.exceptions import RequestException
-import requests
-from bs4 import BeautifulSoup, Tag
-
-# Utilities
-import os
 import hashlib
 import logging
-import sys
+import os
 import random
+import sys
+from urllib.parse import urlparse
+
+import requests
+from bs4 import BeautifulSoup, Tag
+from requests.exceptions import RequestException
+
+from src.utils.config import load_config
+
+logger = logging.getLogger(__name__)
+
 
 # WebScraper Utilities
 def setup_logging():
     """
     Set up the logging configuration for the scraper.
-    
-    This function configures the logging module to output INFO and above logs 
-    to the stdout, while WARNING and above logs are redirected to stderr. 
-    It uses a custom format that prefixes each log message with "RAG_BOT" 
+
+    This function configures the logging module to output INFO and above logs
+    to the stdout, while WARNING and above logs are redirected to stderr.
+    It uses a custom format that prefixes each log message with "RAG_BOT"
     followed by the log timestamp, the log level, and the actual log message.
-    
+
     Returns:
         bool: Always returns True to indicate successful setup.
     """
@@ -39,9 +38,9 @@ def setup_logging():
         level=logging.INFO,
         format="RAG_BOT: %(asctime)s - %(levelname)s - %(message)s"
     )
-    
-    # Create a separate handler for logs of level WARNING and above. 
-    # This handler will send these logs to stderr instead of stdout, 
+
+    # Create a separate handler for logs of level WARNING and above.
+    # This handler will send these logs to stderr instead of stdout,
     # which is helpful to quickly identify warnings and errors.
     stderr_handler = logging.StreamHandler(sys.stderr)
     stderr_handler.setLevel(logging.WARNING)
@@ -51,6 +50,7 @@ def setup_logging():
     logging.getLogger().addHandler(stderr_handler)
 
     return True
+
 
 # WebScraper Base Class
 class Scraper:
@@ -82,8 +82,8 @@ class Scraper:
         """
         Fetch and return a random user agent string from the list specified in the configuration.
 
-        The method chooses a user agent randomly from the list in the CONFIG attribute. Using 
-        random user agents can help mimic genuine user activity, potentially avoiding blocking 
+        The method chooses a user agent randomly from the list in the CONFIG attribute. Using
+        random user agents can help mimic genuine user activity, potentially avoiding blocking
         by web servers during scraping tasks.
 
         Returns:
@@ -91,13 +91,14 @@ class Scraper:
         """
         return random.choice(self.CONFIG["Scraper"]["USER_AGENTS"])
 
+
 # WebScraper Content Parser
 class ContentParser:
     """
-    A class designed to extract meaningful content from HTML tags and 
+    A class designed to extract meaningful content from HTML tags and
     convert them into a markdown format.
-    
-    Supported HTML tags include paragraphs, headers (h1-h6), list items, links, 
+
+    Supported HTML tags include paragraphs, headers (h1-h6), list items, links,
     inline code, and code blocks.
     """
 
@@ -118,7 +119,7 @@ class ContentParser:
 
     def extract_content(self, element):
         """
-        Extract content from a given HTML element and its descendants, 
+        Extract content from a given HTML element and its descendants,
         converting it into markdown format.
 
         Args:
@@ -128,25 +129,25 @@ class ContentParser:
         - str: The extracted content in markdown format.
         """
         content_list = []
-        
+
         # Check if the element is a valid Beautiful Soup Tag
         if isinstance(element, Tag):
-            
+
             # Get the type of tag (e.g., header, text, link)
             tag_type = self.TAG_TYPES.get(element.name)
-            
+
             if tag_type:
                 # Find the corresponding extraction method for the tag type
                 content_method = getattr(self, f"_extract_{tag_type}_content")
-                
+
                 # Extract content from the tag
                 content_list.append(content_method(element))
             else:
-                # If the tag isn't directly mapped in TAG_TYPES, 
+                # If the tag isn't directly mapped in TAG_TYPES,
                 # check its children for content extraction
                 for child in element.children:
                     content_list.append(self.extract_content(child))
-                    
+
         # Join the extracted content list into a single markdown string
         return "\n\n".join(filter(None, content_list))
 
@@ -180,10 +181,10 @@ class ContentParser:
 # WebScraper Class
 class SingletonMeta(type):
     """Metaclass for the Singleton design pattern.
-    
+
     Ensures that only one instance of a class inheriting this metaclass exists.
     """
-    
+
     _instances = {}  # Store created instances
 
     def __call__(cls, *args, **kwargs):
@@ -191,9 +192,10 @@ class SingletonMeta(type):
             cls._instances[cls] = super().__call__(*args, **kwargs)
         return cls._instances[cls]
 
+
 class WebScraper(Scraper, metaclass=SingletonMeta):
     """Main WebScraper class for scraping content from websites and saving to a file.
-    
+
     Inherits base scraper functionalities and uses a singleton pattern for unique instance handling.
     """
 
@@ -215,10 +217,10 @@ class WebScraper(Scraper, metaclass=SingletonMeta):
     @staticmethod
     def is_valid_url(url):
         """Validates the given URL.
-        
+
         Args:
             url (str): The URL to validate.
-        
+
         Returns:
             bool: True if URL is valid, otherwise False.
         """
@@ -230,10 +232,10 @@ class WebScraper(Scraper, metaclass=SingletonMeta):
 
     def fetch_content(self, url):
         """Fetches content from the given URL using HTTP requests.
-        
+
         Args:
             url (str): The URL to fetch content from.
-        
+
         Returns:
             str: Fetched content if successful, otherwise None.
         """
@@ -249,19 +251,19 @@ class WebScraper(Scraper, metaclass=SingletonMeta):
         except RequestException as e:
             self.logger.error(f"Error fetching content from {url}: {e}")
             return None
-                
+
     def parse_content(self, content):
         """Parses the fetched content using BeautifulSoup and extracts the meaningful data.
-        
+
         Args:
             content (str): The fetched web content.
-        
+
         Returns:
             dict: A dictionary containing the parsed data.
         """
         self.logger.info("Parsing the content.")
         soup = BeautifulSoup(content, 'html.parser')
-        
+
         parsed_data = {
             "title": soup.title.string if soup.title else "",
             "metadata": {
@@ -276,30 +278,30 @@ class WebScraper(Scraper, metaclass=SingletonMeta):
     @staticmethod
     def generate_filename(url):
         """Generates a filename using a hash of the URL.
-        
+
         Args:
             url (str): The URL to hash and generate the filename.
-        
+
         Returns:
             str: The generated filename with a path.
         """
         url_hash = hashlib.md5(url.encode()).hexdigest()
-        return os.path.join(load_config()["Scraper"]["DATA_DIR"], f"{url_hash}.md")  
-    
+        return os.path.join(load_config()["Scraper"]["DATA_DIR"], f"{url_hash}.md")
+
     def save_to_file(self, url, content):
         """Saves the parsed content to a file.
-        
+
         Args:
             url (str): The URL used to generate the filename.
             content (str): The parsed content to save.
-        
+
         Returns:
             str: The filepath where content was saved if successful, otherwise None.
         """
         self.logger.info("Saving content to file.")
         filepath = self.generate_filename(url)
         try:
-            with open(filepath, 'w', encoding='utf-8') as f: 
+            with open(filepath, 'w', encoding='utf-8') as f:
                 f.write(content)
             self.logger.info(f"Content saved successfully to {filepath}.")
         except Exception as e:
@@ -309,10 +311,10 @@ class WebScraper(Scraper, metaclass=SingletonMeta):
 
     def scrape_site(self, url):
         """Main method for orchestrating the entire scraping process.
-        
+
         Args:
             url (str): The URL to scrape.
-        
+
         Returns:
             dict: Contains a message indicating the outcome and, if successful, the filepath where content was saved.
         """
@@ -330,13 +332,14 @@ class WebScraper(Scraper, metaclass=SingletonMeta):
         parsed_data = self.parse_content(content)
         parsed_content = parsed_data["content"]
 
-        filepath = self.save_to_file(url, parsed_content)  
+        filepath = self.save_to_file(url, parsed_content)
         if not filepath:
             self.logger.error("Failed to save content.")
             return {"message": "Failed to save content", "data": ""}
 
         self.logger.info("Scraping completed successfully.")
         return {"message": "Scraping completed successfully", "data": filepath}
+
 
 # WebScraper Main function
 def run_web_scraper(url):
@@ -347,25 +350,26 @@ def run_web_scraper(url):
         url (str): The URL of the website to be scraped.
 
     Returns:
-        dict: A dictionary containing the result of the scraping process. 
-              This may include messages indicating success or failure and 
+        dict: A dictionary containing the result of the scraping process.
+              This may include messages indicating success or failure and
               potentially where the scraped data has been saved.
     """
     scraper = WebScraper()
     return scraper.scrape_site(url)
 
+
 if __name__ == "__main__":
-    # Try setting up logging. Logging is essential to track the progress 
+    # Try setting up logging. Logging is essential to track the progress
     # and troubleshoot any issues that arise during the scraping process.
     if setup_logging():
-        
+
         # Prompt the user for the URL to be scraped
         url = input("Enter URL to scrape: ")
-        
+
         # Begin the scraping process
         result = run_web_scraper(url)
 
-        # If the scraping was successful, display a success message with 
+        # If the scraping was successful, display a success message with
         # details about where the data was saved. Otherwise, display an error message.
         if result and result.get("message") == "Scraping completed successfully":
             print(f"Scraping complete! Saved to {result['data']}")
