@@ -1,61 +1,36 @@
-# /app/src/agent/agent_handler.py
-
-# Custom modules
-from src.utils.config import load_config, setup_environment_variables
-from src.tools.setup import ToolSetup
-
-# Primary Components
-from langchain.chains import LLMChain
-from langchain.chat_models import ChatOpenAI
-from langchain.memory import ConversationBufferMemory
-from langchain.agents import ZeroShotAgent, AgentExecutor
-from langchain.prompts import PromptTemplate
-
-# Utilities
-from pathlib import Path
+# src/agent/agent_handler.py
 import logging
 import traceback
+from pathlib import Path
 
-# Global variable to store the agent handler instance.
+from langchain.agents import AgentExecutor
+from langchain.agents.format_scratchpad import format_log_to_str
+from langchain.agents.output_parsers import ReActSingleInputOutputParser
+from langchain.memory import ConversationBufferMemory
+from langchain_core.prompts import PromptTemplate
+from langchain_openai import ChatOpenAI
+
+from src.tools.setup import ToolSetup
+from src.utils.config import load_config, setup_environment_variables
+
+logger = logging.getLogger(__name__)
+
+# Global variable to store the agent handler instance
 _agent_instance = None
 
 
 class AgentHandler:
-    """
-    Class responsible for initializing and executing the conversational agent.
-    Handles OpenAI setup, memory management, and prompt templates.
-    """
-
     def __init__(self):
         self._initialize()
 
     def _initialize(self):
-        """Initialize all components required for the agent."""
-        self._setup_config_and_env()
-        self._setup_openai()
-        self._setup_memory()
-        self._load_prompt_templates()
-        self._initialize_agent_executor()
-
-    def _setup_config_and_env(self):
-        """Load configurations and setup environment variables."""
         self.CONFIG = load_config()
         setup_environment_variables(self.CONFIG)
-
-    def _setup_openai(self):
-        """Initialize the OpenAI model based on configurations."""
-        try:
-            self.llm = ChatOpenAI(
-                model=self.CONFIG["OpenAI"]["model"], 
-                temperature=self.CONFIG["OpenAI"]["llm_temp"]
-            )
-        except Exception as e:
-            logging.error(f"Error initializing OpenAI: {e}")
-            raise
-
-    def _setup_memory(self):
-        """Setup conversation buffer memory for chat history."""
+        self.llm = ChatOpenAI(model=self.CONFIG["OpenAI"]["model"], temperature=self.CONFIG["OpenAI"]["llm_temp"])
         self.memory = ConversationBufferMemory(memory_key="chat_history")
+        self.tools = ToolSetup.setup_tools()
+        self._load_prompt_templates()
+        self.agent_executor = self._initialize_agent_executor()
 
     def _load_prompt_templates(self):
         """Load templates for the ZeroShotAgent's prompts."""
@@ -65,16 +40,6 @@ class AgentHandler:
         except Exception as e:
             logging.error(f"Error loading prompt templates: {e}")
             raise
-
-    def _initialize_agent_executor(self):
-        """Initialize the ZeroShotAgent with proper configurations."""
-        self.agent_executor = self._setup_agent()
-
-    def _setup_tools(self) -> list:
-        """
-        Initialize and return the tools required for the ZeroShotAgent.
-        """
-        return ToolSetup.setup_tools()
 
     def _setup_prompt_template(self) -> PromptTemplate:
         """
@@ -86,7 +51,7 @@ class AgentHandler:
         Raises:
             KeyError: If a required key is missing in self.PROMPT_TEMPLATES.
         """
-        tools = self._setup_tools()  # This method returns a list of tools
+        tools = self.tools
 
         # Extracting the templates from self.PROMPT_TEMPLATES
         try:
@@ -115,44 +80,47 @@ class AgentHandler:
 
         return prompt_template
 
-    def _setup_agent(self) -> AgentExecutor:
-        """
-        Construct and return the ZeroShotAgent with all its configurations.
-        """
+    def _initialize_agent_executor(self):
         prompt = self._setup_prompt_template()
-        llm_chain = LLMChain(llm=self.llm, prompt=prompt)
-        agent = ZeroShotAgent(
-            llm_chain=llm_chain, 
-            tools=self._setup_tools(), 
-            verbose=True
-        )
-        return AgentExecutor.from_agent_and_tools(
-            agent=agent, 
-            tools=self._setup_tools(), 
-            verbose=True, 
-            memory=self.memory
+
+        # Bind the llm with a stop condition
+        llm_with_stop = self.llm.bind(stop=["\nObservation"])
+
+        # Correctly retrieving chat history from memory
+        react_chain = (
+            {
+                "input": lambda x: x["input"],
+                "agent_scratchpad": lambda x: format_log_to_str(x["intermediate_steps"]),
+                "chat_history": lambda x: self.memory.load_memory_variables(x).get('chat_history', '')  # Correct retrieval of chat history
+            }
+            | prompt
+            | llm_with_stop
+            | ReActSingleInputOutputParser()
         )
 
-    def chat_with_agent(self, user_input: str) -> str:
-        """
-        Handle user input to chat with the agent and return its response.
-        """
+        return AgentExecutor(agent=react_chain, tools=self.tools, verbose=True)
+
+    def chat_with_agent(self, user_input: str):
         try:
-            response = self.agent_executor.run(input=user_input)
-            logging.info(f"Successful chat response for input '{user_input}': {response}")
-            return response.get("output") if isinstance(response, dict) else response
+            response = self.agent_executor.invoke({'input': user_input})
+
+            if 'output' in response and hasattr(response['output'], 'response'):
+                chat_response = response['output'].response  # Extract the response text
+            else:
+                chat_response = "Unable to process your request."
+
+            # Log the concise chat response
+            logging.info(f"User input: '{user_input}' | Chatbot response: '{chat_response}'")
+            return chat_response
         except Exception as e:
-            # Capture the full stack trace for the exception and log it
-            tb_str = traceback.format_exception(etype=type(e), value=e, tb=e.__traceback__)
-            logging.error(f"Error while chatting with agent for input '{user_input}': {''.join(tb_str)}")
+            tb_str = traceback.format_exception(None, e, e.__traceback__)
+            logging.error(f"Chat error: {''.join(tb_str)}")
             return "An error occurred."
 
 
-def get_agent_handler() -> AgentHandler:
+def get_agent_handler():
+    # Singleton-like accessor for the AgentHandler instance
     global _agent_instance
     if _agent_instance is None:
         _agent_instance = AgentHandler()
     return _agent_instance
-
-
-
